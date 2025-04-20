@@ -167,16 +167,6 @@ def analyze_and_trade():
         axis=1
     )
     st.bar_chart(df_result.set_index('종목명')['수익률'])
-    if alert_email:
-    if telegram_token and telegram_chat_id:
-        send_telegram_alert("📈 AI 추천 요약 완료")
-        send_telegram_capture()
-    st.info(f"오늘 누적 수익률: {daily_return:.2f}%")
-    if daily_return >= account['daily_profit_target']:
-        st.success("🎯 목표 수익률 달성! 매매 자동 중단.")
-        schedule.clear()
-    return df_result
-
 def run_schedule():
     while True:
         schedule.run_pending()
