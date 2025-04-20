@@ -7,3 +7,4 @@ schedule
 openai
 Pillow
 lxml
+html5lib
