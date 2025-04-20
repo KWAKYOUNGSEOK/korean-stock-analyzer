@@ -168,7 +168,6 @@ def analyze_and_trade():
     )
     st.bar_chart(df_result.set_index('종목명')['수익률'])
     if alert_email:
-        send_email_alert("[AI 주식 성과 보고서]", df_result.to_string(), alert_email)
     if telegram_token and telegram_chat_id:
         send_telegram_alert("📈 AI 추천 요약 완료")
         send_telegram_capture()
