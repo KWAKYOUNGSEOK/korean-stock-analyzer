@@ -1,0 +1,8 @@
+streamlit
+yfinance
+pandas
+plotly
+requests
+schedule
+openai
+Pillow
