@@ -159,9 +159,12 @@ def analyze_and_trade():
     df_result = pd.DataFrame(result)
     df_result.to_csv("추천_종목_리포트.csv", index=False)
     st.subheader("📊 예상 수익률 분포")
-   df_result['수익률'] = df_result.apply(
-    lambda x: (x.get('익절가', 0) - x.get('추천 가격', 0)) / x.get('추천 가격', 1) * 100 
-    if x.get('추천 가격') and x.get('익절가') else 0,
+  df_result['수익률'] = df_result.apply(
+    lambda x: (
+        (x.get('익절가', 0) - x.get('추천 가격', 0)) / x.get('추천 가격', 1) * 100
+        if x.get('추천 가격') and x.get('익절가')
+        else 0
+    ),
     axis=1
 )
     st.bar_chart(df_result.set_index('종목명')['수익률'])
