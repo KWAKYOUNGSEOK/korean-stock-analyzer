@@ -1,5 +1,5 @@
+
 # Korean Stock Analyzer with Strategy Customization, Alerts, Portfolio Tracking, and GPT Strategy Tuning
-# Required libraries: streamlit, yfinance, pandas, plotly, requests, schedule, smtplib, email, openai, PIL
 
 import streamlit as st
 import pandas as pd
@@ -22,10 +22,10 @@ st.set_page_config(page_title="한국 주식 AI 자동 매매 시스템", layout
 st.title("🤖 AI 자동매매 + 전략 개선 + 성과 보고서 + 백테스트")
 
 mode = st.radio("💼 모드 선택", ("모의투자", "실전투자"))
-alert_email = st.text_input("📧 new7943@naver.com", "")
-telegram_token = st.text_input("📱 7135855819:AAHrLGa1Zx1uIEkoio0Q1VVjNdvEcX8HPlc", "")
-telegram_chat_id = st.text_input("💬 1629419664", "")
-openai.api_key = st.text_input("🔐 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", type="Ed45cv7vb!&")
+alert_email = st.text_input("📧 알림 이메일 주소 (선택)", "")
+telegram_token = st.text_input("📱 텔레그램 봇 토큰 (선택)", "")
+telegram_chat_id = st.text_input("💬 텔레그램 챗 ID (선택)", "")
+openai.api_key = st.text_input("🔐 OpenAI API Key (선택)", type="password")
 
 account = {
     "CANO": "43019240",
@@ -36,14 +36,12 @@ account = {
 }
 
 @st.cache_data
-
 def load_korean_tickers():
     url = 'https://kind.krx.co.kr/corpgeneral/corpList.do?method=download'
     krx_df = pd.read_html(url, header=0, encoding='euc-kr')[0]
     krx_df = krx_df[['회사명', '종목코드']]
     krx_df['종목코드'] = krx_df['종목코드'].apply(lambda x: f"{int(x):06d}.KS")
     return dict(zip(krx_df['회사명'], krx_df['종목코드']))
-
 
 def calculate_signals(data):
     data['MA20'] = data['Close'].rolling(window=20).mean()
@@ -73,8 +71,8 @@ def send_kis_order(token, code, price, qty, action, appkey, appsecret):
     headers = {
         "content-type": "application/json",
         "authorization": f"Bearer {token}",
-        appkey = "PSrXlldVsNGDbGULpDWODXr6ckTWQKUK2iz2"
-        appsecret = "dPfN4uuMGbWkLXOAi4/pHPLGTk14mcwWT9E4roS6tDPmPk6fLA48HMr6U+HSErtmdnImLlXFNVtMVJRzDgmdoGj5gwVUhuafT2JjJstMWJvGLrU+gill9gmD55N4CMuO5ttcg1pGy2G9lEMhiX6uyPc/I2i5xIvv56lF7KpVXe0VD6Rpe/E="
+        "appkey": appkey,
+        "appsecret": appsecret,
         "tr_id": "TTTC0802U" if action == "buy" else "TTTC0801U",
     }
     body = {
@@ -131,8 +129,10 @@ def get_kis_token(appkey, appsecret):
 
 def analyze_and_trade():
     tickers = load_korean_tickers()
-    result, appkey, appsecret = [], "PSrXlldVsNGDbGULpDWODXr6ckTWQKUK2iz2", "dPfN4uuMGbWkLXOAi4/pHPLGTk14mcwWT9E4roS6tDPmPk6fLA48HMr6U+HSErtmdnImLlXFNVtMVJRzDgmdoGj5gwVUhuafT2JjJstMWJvGLrU+gill9gmD55N4CMuO5ttcg1pGy2G9lEMhiX6uyPc/I2i5xIvv56lF7KpVXe0VD6Rpe/E="
+    appkey = st.secrets.get("APP_KEY", "YOUR_APP_KEY")
+    appsecret = st.secrets.get("APP_SECRET", "YOUR_APP_SECRET")
     token = get_kis_token(appkey, appsecret)
+    result = []
     profit_sum = 0
     for name, code in list(tickers.items())[:20]:
         try:
